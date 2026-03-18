@@ -36,10 +36,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { email, name } = await request.json();
+  const { email, name, role } = await request.json();
   if (!email) {
     return NextResponse.json({ error: "Email required" }, { status: 400 });
   }
+
+  const validRoles = ["USER", "ADMIN"] as const;
+  const assignedRole = validRoles.includes(role) ? role : "USER";
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -47,7 +50,7 @@ export async function POST(request: NextRequest) {
   }
 
   const user = await prisma.user.create({
-    data: { email, name: name || null, role: "USER" },
+    data: { email, name: name || null, role: assignedRole },
     select: {
       id: true,
       email: true,
