@@ -11,6 +11,18 @@ interface ScrapedRecipe {
   sourceUrl: string;
 }
 
+function decodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&#(\d+);/g, (_m, code) => String.fromCharCode(Number(code)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_m, code) => String.fromCharCode(parseInt(code, 16)))
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'");
+}
+
 function parseDuration(iso: string): number | null {
   if (!iso) return null;
   const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?/);
@@ -131,23 +143,23 @@ export async function scrapeRecipe(url: string): Promise<ScrapedRecipe | null> {
   const instructions = rd.recipeInstructions;
   if (Array.isArray(instructions)) {
     steps = instructions.map((inst) => {
-      if (typeof inst === "string") return inst;
-      if (inst?.text) return inst.text as string;
-      if (inst?.name) return inst.name as string;
-      return String(inst);
+      if (typeof inst === "string") return decodeHtmlEntities(inst);
+      if (inst?.text) return decodeHtmlEntities(inst.text as string);
+      if (inst?.name) return decodeHtmlEntities(inst.name as string);
+      return decodeHtmlEntities(String(inst));
     });
   } else if (typeof instructions === "string") {
-    steps = instructions.split(/\n+/).filter(Boolean);
+    steps = instructions.split(/\n+/).filter(Boolean).map(decodeHtmlEntities);
   }
 
   // Parse ingredients
   const rawIngredients = Array.isArray(rd.recipeIngredient)
-    ? (rd.recipeIngredient as string[])
+    ? (rd.recipeIngredient as string[]).map(decodeHtmlEntities)
     : [];
 
   return {
-    title: (rd.name as string) || "",
-    description: (rd.description as string) || "",
+    title: decodeHtmlEntities((rd.name as string) || ""),
+    description: decodeHtmlEntities((rd.description as string) || ""),
     steps: steps.length > 0 ? steps : [""],
     prepTime: parseDuration(rd.prepTime as string),
     cookTime: parseDuration(rd.cookTime as string),
