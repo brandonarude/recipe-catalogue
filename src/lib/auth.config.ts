@@ -26,6 +26,12 @@ export const authConfig = {
       const isAuthPage =
         request.nextUrl.pathname.startsWith("/login") ||
         request.nextUrl.pathname.startsWith("/auth");
+
+      // Redirect logged-in users away from auth pages
+      if (isAuthPage && isLoggedIn) {
+        return Response.redirect(new URL("/", request.url));
+      }
+
       if (isAuthPage) return true;
       return isLoggedIn;
     },
