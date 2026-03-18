@@ -17,6 +17,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     ...authConfig.callbacks,
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id as string },
+          select: { role: true },
+        });
+        token.role = dbUser?.role ?? "USER";
+      }
+      return token;
+    },
     async signIn({ user, account }) {
       // For OAuth providers, only allow sign-in if the admin has already
       // added the user's email to the database.

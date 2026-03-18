@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Nunito, Lora } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
 import "./globals.css";
 
-const inter = Inter({
+const nunito = Nunito({
+  variable: "--font-heading",
+  subsets: ["latin"],
+});
+
+const lora = Lora({
   variable: "--font-sans",
   subsets: ["latin"],
 });
@@ -20,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${nunito.variable} ${lora.variable} antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>
