@@ -18,13 +18,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     ...authConfig.callbacks,
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id as string },
-          select: { role: true },
-        });
-        token.role = dbUser?.role ?? "USER";
+      // Resolve id and role from the database on sign-in or if role is
+      // missing (e.g. token issued before this callback was added).
+      // Using email as the lookup key works for both magic-link and OAuth.
+      if (user || !token.role) {
+        const email = (user?.email ?? token.email) as string | undefined;
+        if (email) {
+          const dbUser = await prisma.user.findUnique({
+            where: { email },
+            select: { id: true, role: true },
+          });
+          if (dbUser) {
+            token.id = dbUser.id;
+            token.role = dbUser.role;
+          }
+        }
       }
       return token;
     },

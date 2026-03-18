@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito, Lora } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
+import { auth } from "@/lib/auth";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -18,15 +19,16 @@ export const metadata: Metadata = {
   description: "A family recipe collection",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
   return (
     <html lang="en">
       <body className={`${nunito.variable} ${lora.variable} antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers session={session}>{children}</Providers>
       </body>
     </html>
   );
