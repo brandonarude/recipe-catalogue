@@ -2,10 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Download, RefreshCw, ShoppingCart } from "lucide-react";
+import { Download, RefreshCw, ShoppingCart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toTitleCase } from "@/lib/utils";
 
 interface ShoppingItem {
@@ -68,6 +79,16 @@ export function ShoppingListView() {
     window.open("/api/shopping-list/export", "_blank");
   }
 
+  async function handleClear() {
+    try {
+      await fetch("/api/shopping-list", { method: "DELETE" });
+      setList(null);
+      toast.success("Shopping list cleared");
+    } catch {
+      toast.error("Failed to clear shopping list");
+    }
+  }
+
   if (loading) {
     return <div className="py-12 text-center text-muted-foreground">Loading...</div>;
   }
@@ -77,7 +98,7 @@ export function ShoppingListView() {
       <div className="py-12 text-center">
         <ShoppingCart className="mx-auto h-12 w-12 text-muted-foreground/50" />
         <p className="mt-4 text-muted-foreground">
-          No shopping list yet. Generate one from recipes or your meal plan.
+          No shopping list yet. Add ingredients from any recipe to get started.
         </p>
       </div>
     );
@@ -108,6 +129,29 @@ export function ShoppingListView() {
             <RefreshCw className="mr-1 h-4 w-4" />
             Refresh
           </Button>
+          <AlertDialog>
+            <AlertDialogTrigger>
+              <Button variant="outline" size="sm">
+                <Trash2 className="mr-1 h-4 w-4" />
+                Clear
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Clear shopping list?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will remove all items from your shopping list. This action
+                  cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction variant="destructive" onClick={handleClear}>
+                  Clear
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 

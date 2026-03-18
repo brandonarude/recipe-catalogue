@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { generateShoppingListSchema } from "@/lib/validators/shopping-list";
+import { addRecipeIngredientsSchema } from "@/lib/validators/shopping-list";
 
 export async function GET() {
   const session = await auth();
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const parsed = generateShoppingListSchema.safeParse(body);
+  const parsed = addRecipeIngredientsSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Validation failed", issues: parsed.error.issues },
@@ -37,60 +37,69 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { recipeIds } = parsed.data;
+  const { ingredients } = parsed.data;
 
-  // Get all ingredients from selected recipes
-  const recipeIngredients = await prisma.recipeIngredient.findMany({
-    where: { recipeId: { in: recipeIds } },
-    include: { ingredient: true },
-  });
+  const list = await prisma.$transaction(async (tx) => {
+    // Find or create the user's shopping list
+    let shoppingList = await tx.shoppingList.findUnique({
+      where: { userId: session.user!.id },
+      include: { items: true },
+    });
 
-  // Deduplicate and aggregate
-  const aggregated = new Map<
-    string,
-    { ingredientId: string; quantity: number | null; unit: string | null }
-  >();
-
-  for (const ri of recipeIngredients) {
-    const key = `${ri.ingredientId}:${ri.unit || ""}`;
-    const existing = aggregated.get(key);
-    if (existing) {
-      if (existing.quantity != null && ri.quantity != null) {
-        existing.quantity += ri.quantity;
-      } else if (ri.quantity != null) {
-        existing.quantity = ri.quantity;
-      }
-    } else {
-      aggregated.set(key, {
-        ingredientId: ri.ingredientId,
-        quantity: ri.quantity,
-        unit: ri.unit,
+    if (!shoppingList) {
+      shoppingList = await tx.shoppingList.create({
+        data: { userId: session.user!.id },
+        include: { items: true },
       });
     }
-  }
 
-  // Delete existing list and create new one
-  await prisma.shoppingList.deleteMany({
-    where: { userId: session.user.id },
-  });
+    // Build a map of existing items keyed by "ingredientId:unit"
+    const existingMap = new Map<string, { id: string; quantity: number | null }>();
+    for (const item of shoppingList.items) {
+      const key = `${item.ingredientId}:${item.unit || ""}`;
+      existingMap.set(key, { id: item.id, quantity: item.quantity });
+    }
 
-  const list = await prisma.shoppingList.create({
-    data: {
-      userId: session.user.id,
-      items: {
-        create: Array.from(aggregated.values()).map((item) => ({
-          ingredientId: item.ingredientId,
-          quantity: item.quantity,
-          unit: item.unit,
-        })),
+    // Aggregate incoming ingredients with existing items
+    for (const ing of ingredients) {
+      const key = `${ing.ingredientId}:${ing.unit || ""}`;
+      const existing = existingMap.get(key);
+
+      if (existing) {
+        // Aggregate: null + null = null, null + N = N, N + M = N+M
+        let newQuantity: number | null = existing.quantity;
+        if (ing.quantity != null) {
+          newQuantity =
+            existing.quantity != null
+              ? existing.quantity + ing.quantity
+              : ing.quantity;
+        }
+        await tx.shoppingListItem.update({
+          where: { id: existing.id },
+          data: { quantity: newQuantity },
+        });
+      } else {
+        await tx.shoppingListItem.create({
+          data: {
+            shoppingListId: shoppingList.id,
+            ingredientId: ing.ingredientId,
+            quantity: ing.quantity,
+            unit: ing.unit,
+          },
+        });
+      }
+    }
+
+    // Return the updated list
+    return tx.shoppingList.findUnique({
+      where: { id: shoppingList.id },
+      include: {
+        items: {
+          include: { ingredient: true },
+          orderBy: { ingredient: { category: "asc" } },
+        },
       },
-    },
-    include: {
-      items: {
-        include: { ingredient: true },
-        orderBy: { ingredient: { category: "asc" } },
-      },
-    },
+    });
   });
 
   return NextResponse.json(list, { status: 201 });
@@ -107,6 +116,19 @@ export async function PUT(request: NextRequest) {
   await prisma.shoppingListItem.update({
     where: { id: itemId },
     data: { checked },
+  });
+
+  return NextResponse.json({ success: true });
+}
+
+export async function DELETE() {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  await prisma.shoppingList.deleteMany({
+    where: { userId: session.user.id },
   });
 
   return NextResponse.json({ success: true });

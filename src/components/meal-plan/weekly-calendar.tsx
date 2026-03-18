@@ -11,7 +11,7 @@ import {
   isSameDay,
 } from "date-fns";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, ShoppingCart, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MealSlot } from "./meal-slot";
 import { AddMealDialog } from "./add-meal-dialog";
@@ -35,7 +35,6 @@ export function WeeklyCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [meals, setMeals] = useState<MealPlanEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [generatingList, setGeneratingList] = useState(false);
 
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
@@ -76,29 +75,6 @@ export function WeeklyCalendar() {
     }
   }
 
-  async function generateShoppingList() {
-    const recipeIds = [...new Set(meals.map((m) => m.recipe.id))];
-    if (recipeIds.length === 0) {
-      toast.error("No meals planned this week");
-      return;
-    }
-
-    setGeneratingList(true);
-    try {
-      const res = await fetch("/api/shopping-list", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recipeIds }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success("Shopping list generated from meal plan!");
-    } catch {
-      toast.error("Failed to generate shopping list");
-    } finally {
-      setGeneratingList(false);
-    }
-  }
-
   return (
     <div className="space-y-4">
       {/* Week navigation */}
@@ -129,19 +105,6 @@ export function WeeklyCalendar() {
             Today
           </Button>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={generateShoppingList}
-          disabled={generatingList || meals.length === 0}
-        >
-          {generatingList ? (
-            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-          ) : (
-            <ShoppingCart className="mr-1 h-4 w-4" />
-          )}
-          Shopping List
-        </Button>
       </div>
 
       {loading ? (
