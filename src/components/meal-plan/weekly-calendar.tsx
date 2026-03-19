@@ -85,7 +85,7 @@ export function WeeklyCalendar() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Week navigation */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -121,7 +121,7 @@ export function WeeklyCalendar() {
       ) : (
         <>
           {/* Mobile: horizontal day picker + single day view */}
-          <div className="md:hidden space-y-4">
+          <div className="md:hidden space-y-2">
             {/* Day picker strip */}
             <div className="flex gap-1 overflow-x-auto pb-1">
               {days.map((day) => {

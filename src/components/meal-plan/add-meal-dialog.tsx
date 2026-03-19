@@ -106,8 +106,8 @@ export function AddMealDialog({ date, mealType, onAdded }: AddMealDialogProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger>
-        <button className="flex w-full items-center justify-center gap-1 rounded border border-dashed py-2 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-          <Plus className="h-4 w-4" />
+        <button className="flex w-full items-center justify-center gap-1 rounded border border-dashed py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+          <Plus className="h-3 w-3" />
           Add
         </button>
       </DialogTrigger>

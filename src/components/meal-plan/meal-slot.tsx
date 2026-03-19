@@ -27,11 +27,11 @@ const mealLabels: Record<string, string> = {
 
 export function MealSlot({ mealType, meals, onRemove, addButton }: MealSlotProps) {
   return (
-    <div className="rounded-md bg-muted/50 p-2.5">
-      <div className="mb-1 text-sm font-medium text-muted-foreground">
+    <div className="rounded-md bg-muted/50 p-2">
+      <div className="mb-1.5 text-xs font-medium text-muted-foreground">
         {mealLabels[mealType] || mealType}
       </div>
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {meals.map((meal) => (
           <div
             key={meal.id}
