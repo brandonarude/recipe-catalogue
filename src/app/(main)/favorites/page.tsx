@@ -1,42 +1,81 @@
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import { RecipeGrid } from "@/components/recipes/recipe-grid";
 
-export const metadata = { title: "Favorites - Recipe Catalogue" };
+interface Recipe {
+  id: string;
+  title: string;
+  description: string | null;
+  cookTime: number | null;
+  photos: { url: string }[];
+  tags: { tag: { id: string; name: string } }[];
+  avgRating: number | null;
+  _count: { ratings: number };
+}
 
-export default async function FavoritesPage() {
-  const session = await auth();
-  if (!session?.user) return null;
+export default function FavoritesPage() {
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  const favorites = await prisma.favorite.findMany({
-    where: { userId: session.user.id },
-    include: {
-      recipe: {
-        include: {
-          photos: { orderBy: { order: "asc" }, take: 1 },
-          tags: { include: { tag: true } },
-          ratings: { select: { score: true } },
-          _count: { select: { ratings: true } },
-        },
-      },
-    },
-  });
+  const fetchFavorites = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: "20" });
+      const res = await fetch(`/api/favorites?${params}`);
+      if (res.ok) {
+        const data = await res.json();
+        setRecipes(data.recipes);
+        setTotalPages(data.totalPages);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
+    }
+  }, [page]);
 
-  const recipes = favorites.map(({ recipe }) => {
-    const avgRating =
-      recipe.ratings.length > 0
-        ? recipe.ratings.reduce((sum, r) => sum + r.score, 0) / recipe.ratings.length
-        : null;
-    const { ratings: _ratings, ...rest } = recipe;
-    return { ...rest, avgRating };
-  });
+  useEffect(() => {
+    fetchFavorites();
+  }, [fetchFavorites]);
 
   return (
     <div>
       <h1 className="text-2xl font-bold">My Favorites</h1>
       <div className="mt-4">
-        <RecipeGrid recipes={recipes} />
+        {loading ? (
+          <p className="py-12 text-center text-muted-foreground">Loading...</p>
+        ) : (
+          <RecipeGrid recipes={recipes} />
+        )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

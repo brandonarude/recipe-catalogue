@@ -9,25 +9,41 @@ async function requireAdmin() {
   return session;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const session = await requireAdmin();
   if (!session) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: "asc" },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      createdAt: true,
-      _count: { select: { recipes: true } },
-    },
-  });
+  const searchParams = request.nextUrl.searchParams;
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const limit = parseInt(searchParams.get("limit") || "20", 10);
 
-  return NextResponse.json(users);
+  const select = {
+    id: true,
+    email: true,
+    name: true,
+    role: true,
+    createdAt: true,
+    _count: { select: { recipes: true } },
+  } as const;
+
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { createdAt: "asc" },
+      select,
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.user.count(),
+  ]);
+
+  return NextResponse.json({
+    users,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  });
 }
 
 export async function POST(request: NextRequest) {
