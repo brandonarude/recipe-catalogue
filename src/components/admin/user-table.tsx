@@ -118,7 +118,7 @@ export function UserTable({ users, currentUserId, onRefresh }: UserTableProps) {
                 <div className="flex justify-end gap-1">
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="default"
                     onClick={() =>
                       changeRole(
                         user.id,
@@ -133,7 +133,7 @@ export function UserTable({ users, currentUserId, onRefresh }: UserTableProps) {
                     <AlertDialogTrigger>
                       <Button
                         variant="ghost"
-                        size="icon-sm"
+                        size="icon"
                         disabled={loading === user.id}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />

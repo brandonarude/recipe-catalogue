@@ -121,17 +121,17 @@ export function ShoppingListView() {
           {checkedCount}/{list.items.length} items checked
         </span>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleExport}>
+          <Button variant="outline" size="default" onClick={handleExport}>
             <Download className="mr-1 h-4 w-4" />
             Export
           </Button>
-          <Button variant="outline" size="sm" onClick={fetchList}>
+          <Button variant="outline" size="default" onClick={fetchList}>
             <RefreshCw className="mr-1 h-4 w-4" />
             Refresh
           </Button>
           <AlertDialog>
             <AlertDialogTrigger>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="default">
                 <Trash2 className="mr-1 h-4 w-4" />
                 Clear
               </Button>
@@ -164,7 +164,7 @@ export function ShoppingListView() {
             {items.map((item) => (
               <label
                 key={item.id}
-                className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent cursor-pointer"
+                className="flex items-center gap-3 rounded-md px-3 py-2.5 hover:bg-accent cursor-pointer"
               >
                 <Checkbox
                   checked={item.checked}
@@ -175,8 +175,8 @@ export function ShoppingListView() {
                 <span
                   className={
                     item.checked
-                      ? "line-through text-muted-foreground"
-                      : "text-sm"
+                      ? "text-base line-through text-muted-foreground"
+                      : "text-base"
                   }
                 >
                   {item.quantity != null && (

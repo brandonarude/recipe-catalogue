@@ -19,7 +19,7 @@ export function PhotoCarousel({ photos, title }: PhotoCarouselProps) {
 
   if (photos.length === 1) {
     return (
-      <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl">
         <Image
           src={photos[0].url}
           alt={title}
@@ -36,7 +36,7 @@ export function PhotoCarousel({ photos, title }: PhotoCarouselProps) {
       <CarouselContent>
         {photos.map((photo, i) => (
           <CarouselItem key={photo.url}>
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+            <div className="relative aspect-video w-full overflow-hidden rounded-xl">
               <Image
                 src={photo.url}
                 alt={`${title} photo ${i + 1}`}

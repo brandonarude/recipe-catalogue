@@ -5,12 +5,12 @@ import { auth } from "@/lib/auth";
 import "./globals.css";
 
 const nunito = Nunito({
-  variable: "--font-heading",
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
 const lora = Lora({
-  variable: "--font-sans",
+  variable: "--font-heading",
   subsets: ["latin"],
 });
 
@@ -26,7 +26,7 @@ export default async function RootLayout({
 }>) {
   const session = await auth();
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${nunito.variable} ${lora.variable} antialiased`}>
         <Providers session={session}>{children}</Providers>
       </body>

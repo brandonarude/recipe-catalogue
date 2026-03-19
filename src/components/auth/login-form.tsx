@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CookingPot } from "lucide-react";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -25,9 +26,9 @@ export function LoginForm() {
 
   if (sent) {
     return (
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-sm shadow-lg">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Check your email</CardTitle>
+          <CardTitle className="font-heading text-xl">Check your email</CardTitle>
           <CardDescription>
             We sent a magic link to <strong>{email}</strong>. Click it to sign
             in.
@@ -38,9 +39,12 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="w-full max-w-sm shadow-lg">
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Recipe Catalogue</CardTitle>
+        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+          <CookingPot className="h-6 w-6 text-primary" />
+        </div>
+        <CardTitle className="font-heading text-xl">Recipe Catalogue</CardTitle>
         <CardDescription>
           Sign in with your email to continue
         </CardDescription>

@@ -87,7 +87,7 @@ export function RecipeDetail({ recipe, currentUserId, isAdmin }: RecipeDetailPro
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">{recipe.title}</h1>
+            <h1 className="text-3xl font-bold">{recipe.title}</h1>
             <FavoriteButton recipeId={recipe.id} isFavorited={recipe.isFavorited} />
           </div>
           {recipe.description && (
@@ -101,14 +101,14 @@ export function RecipeDetail({ recipe, currentUserId, isAdmin }: RecipeDetailPro
           <div className="flex shrink-0 gap-2">
             <Link
               href={`/recipes/${recipe.id}/edit`}
-              className={buttonVariants({ variant: "outline", size: "sm" })}
+              className={buttonVariants({ variant: "outline", size: "default" })}
             >
               <Edit className="mr-1 h-4 w-4" />
               Edit
             </Link>
             <AlertDialog>
               <AlertDialogTrigger>
-                <Button variant="destructive" size="sm" disabled={deleting}>
+                <Button variant="destructive" size="default" disabled={deleting}>
                   <Trash2 className="mr-1 h-4 w-4" />
                   Delete
                 </Button>
@@ -189,10 +189,10 @@ export function RecipeDetail({ recipe, currentUserId, isAdmin }: RecipeDetailPro
       {/* Steps */}
       <div>
         <h2 className="mb-3 text-lg font-semibold">Instructions</h2>
-        <ol className="space-y-3">
+        <ol className="space-y-4">
           {steps.map((step, i) => (
-            <li key={i} className="flex gap-3 text-sm">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+            <li key={i} className="flex gap-3 text-base">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                 {i + 1}
               </span>
               <p className="pt-0.5">{step}</p>
@@ -207,7 +207,7 @@ export function RecipeDetail({ recipe, currentUserId, isAdmin }: RecipeDetailPro
           <Separator />
           <div>
             <h2 className="mb-2 text-lg font-semibold">Notes</h2>
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+            <p className="text-base text-muted-foreground whitespace-pre-wrap">
               {recipe.notes}
             </p>
           </div>

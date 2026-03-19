@@ -27,15 +27,15 @@ const mealLabels: Record<string, string> = {
 
 export function MealSlot({ mealType, meals, onRemove, addButton }: MealSlotProps) {
   return (
-    <div className="rounded-md bg-muted/50 p-2">
-      <div className="mb-1 text-xs font-medium text-muted-foreground">
+    <div className="rounded-md bg-muted/50 p-2.5">
+      <div className="mb-1 text-sm font-medium text-muted-foreground">
         {mealLabels[mealType] || mealType}
       </div>
       <div className="space-y-1">
         {meals.map((meal) => (
           <div
             key={meal.id}
-            className="flex items-center justify-between rounded bg-background px-2 py-1 text-xs"
+            className="flex items-center justify-between rounded bg-background px-2.5 py-1.5 text-sm"
           >
             <span className="line-clamp-1 flex-1">
               {meal.courseType === "SIDE" && (
@@ -45,9 +45,9 @@ export function MealSlot({ mealType, meals, onRemove, addButton }: MealSlotProps
             </span>
             <button
               onClick={() => onRemove(meal.id)}
-              className="ml-1 shrink-0 text-muted-foreground hover:text-destructive"
+              className="ml-1 shrink-0 p-1 text-muted-foreground hover:text-destructive"
             >
-              <X className="h-3 w-3" />
+              <X className="h-4 w-4" />
             </button>
           </div>
         ))}

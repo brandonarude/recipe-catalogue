@@ -42,8 +42,8 @@ export function FavoriteButton({ recipeId, isFavorited: initialFavorited }: Favo
     >
       <Heart
         className={cn(
-          "h-5 w-5 transition-colors",
-          favorited ? "fill-red-500 text-red-500" : "text-muted-foreground"
+          "h-6 w-6 transition-colors",
+          favorited ? "fill-favorite-red text-favorite-red" : "text-muted-foreground"
         )}
       />
     </Button>

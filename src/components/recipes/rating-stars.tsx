@@ -57,15 +57,15 @@ export function RatingStars({
             onMouseEnter={() => interactive && setHovered(star)}
             onMouseLeave={() => setHovered(0)}
             className={cn(
-              "p-0.5 transition-colors",
+              "p-1 transition-colors",
               interactive && "cursor-pointer hover:scale-110"
             )}
           >
             <Star
               className={cn(
-                "h-5 w-5",
+                "h-6 w-6",
                 star <= displayRating
-                  ? "fill-yellow-400 text-yellow-400"
+                  ? "fill-star-amber text-star-amber"
                   : "text-muted-foreground/30"
               )}
             />
