@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import {
   BookOpen,
+  Carrot,
   Heart,
   ShoppingCart,
   CalendarDays,
@@ -24,6 +25,7 @@ import { useState } from "react";
 
 const navItems = [
   { href: "/", label: "Recipes", icon: BookOpen },
+  { href: "/ingredients", label: "Ingredients", icon: Carrot },
   { href: "/favorites", label: "Favorites", icon: Heart },
   { href: "/shopping-list", label: "Shopping List", icon: ShoppingCart },
   { href: "/meal-plan", label: "Meal Plan", icon: CalendarDays },
