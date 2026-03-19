@@ -50,7 +50,7 @@ export function IngredientInputRow({ value, onChange, onRemove }: IngredientInpu
               <button
                 key={s.id}
                 type="button"
-                className="w-full px-3 py-2 text-left text-sm hover:bg-accent"
+                className="w-full px-3 py-2.5 md:py-2 text-left text-sm hover:bg-accent"
                 onMouseDown={() => {
                   setQuery(s.name);
                   onChange({ ...value, name: s.name });
@@ -64,7 +64,7 @@ export function IngredientInputRow({ value, onChange, onRemove }: IngredientInpu
         )}
       </div>
       <Input
-        className="w-20"
+        className="flex-1 sm:flex-none sm:w-20"
         placeholder="Qty"
         type="number"
         step="any"
@@ -77,13 +77,13 @@ export function IngredientInputRow({ value, onChange, onRemove }: IngredientInpu
         }
       />
       <Input
-        className="w-24"
+        className="flex-1 sm:flex-none sm:w-24"
         placeholder="Unit"
         value={value.unit ?? ""}
         onChange={(e) => onChange({ ...value, unit: e.target.value || null })}
       />
       <Input
-        className="w-28"
+        className="flex-1 sm:flex-none sm:w-28"
         placeholder="Prep (diced)"
         value={value.preparation ?? ""}
         onChange={(e) =>

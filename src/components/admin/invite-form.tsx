@@ -54,8 +54,8 @@ export function InviteForm({ onInvited }: InviteFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3">
-      <div className="space-y-1">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+      <div className="w-full sm:w-auto space-y-1">
         <Label htmlFor="invite-email">Email</Label>
         <Input
           id="invite-email"
@@ -66,7 +66,7 @@ export function InviteForm({ onInvited }: InviteFormProps) {
           required
         />
       </div>
-      <div className="space-y-1">
+      <div className="w-full sm:w-auto space-y-1">
         <Label htmlFor="invite-name">Name (optional)</Label>
         <Input
           id="invite-name"
@@ -75,7 +75,7 @@ export function InviteForm({ onInvited }: InviteFormProps) {
           onChange={(e) => setName(e.target.value)}
         />
       </div>
-      <div className="space-y-1">
+      <div className="w-full sm:w-auto space-y-1">
         <Label>Role</Label>
         <Select value={role} onValueChange={(val) => setRole(val as "USER" | "ADMIN")}>
           <SelectTrigger>
@@ -87,7 +87,7 @@ export function InviteForm({ onInvited }: InviteFormProps) {
           </SelectContent>
         </Select>
       </div>
-      <Button type="submit" disabled={loading || !email}>
+      <Button type="submit" disabled={loading || !email} className="w-full sm:w-auto">
         <UserPlus className="mr-1 h-4 w-4" />
         {loading ? "Inviting..." : "Invite User"}
       </Button>

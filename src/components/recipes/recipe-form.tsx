@@ -228,9 +228,9 @@ export function RecipeForm({ recipeId, defaultValues }: RecipeFormProps) {
       {/* Dietary Tags */}
       <div className="space-y-2">
         <Label>Dietary Tags</Label>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
           {dietaryTags.map((dt) => (
-            <label key={dt.id} className="flex items-center gap-2 text-sm">
+            <label key={dt.id} className="flex items-center gap-2.5 rounded-md py-2 md:py-0.5 text-sm">
               <Checkbox
                 checked={watchedDietaryTagIds.includes(dt.id)}
                 onCheckedChange={(checked) => {

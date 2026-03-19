@@ -101,7 +101,7 @@ export function AddRecipeToList({ onAdded }: AddRecipeToListProps) {
               {recipes.map((recipe) => (
                 <button
                   key={recipe.id}
-                  className="flex w-full items-center justify-between rounded-md p-2 text-sm hover:bg-accent"
+                  className="flex w-full items-center justify-between rounded-md p-3 md:p-2 text-base md:text-sm hover:bg-accent"
                   onClick={() => handleSelectRecipe(recipe)}
                 >
                   <span className="text-left">{recipe.title}</span>

@@ -127,9 +127,9 @@ export function IngredientSelectorContent({
         shopping list.
       </p>
 
-      <label className="flex items-center gap-3 rounded-md p-2 hover:bg-accent cursor-pointer">
+      <label className="flex items-center gap-3 rounded-md px-3 py-3 md:py-2 hover:bg-accent cursor-pointer">
         <Checkbox checked={allSelected} onCheckedChange={toggleAll} />
-        <span className="text-sm font-medium">
+        <span className="text-base md:text-sm font-medium">
           {allSelected ? "Deselect All" : "Select All"}
         </span>
       </label>
@@ -140,13 +140,13 @@ export function IngredientSelectorContent({
         {ingredients.map((ing) => (
           <label
             key={ing.id}
-            className="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-accent cursor-pointer"
+            className="flex items-center gap-3 rounded-md px-3 py-3 md:py-1.5 hover:bg-accent cursor-pointer"
           >
             <Checkbox
               checked={selected.has(ing.id)}
               onCheckedChange={() => toggleOne(ing.id)}
             />
-            <span className="text-sm">
+            <span className="text-base md:text-sm">
               {ing.quantity != null && <strong>{ing.quantity}</strong>}
               {ing.unit && ` ${ing.unit}`}{" "}
               {toTitleCase(ing.ingredient.name)}

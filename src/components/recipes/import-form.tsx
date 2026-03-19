@@ -85,7 +85,7 @@ export function ImportForm({ onImported }: ImportFormProps) {
           </Button>
         </div>
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-sm md:text-xs text-muted-foreground">
         Paste a recipe URL to auto-fill the form. Works best with sites that use
         structured recipe data (schema.org).
       </p>

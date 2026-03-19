@@ -33,8 +33,10 @@ export default async function FavoritesPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">My Favorites</h1>
-      <RecipeGrid recipes={recipes} />
+      <h1 className="text-2xl font-bold">My Favorites</h1>
+      <div className="mt-4">
+        <RecipeGrid recipes={recipes} />
+      </div>
     </div>
   );
 }

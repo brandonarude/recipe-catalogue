@@ -18,6 +18,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
@@ -120,8 +121,10 @@ export function SearchFilters({ allTags, allDietaryTags }: SearchFiltersProps) {
             </Button>
           </SheetTrigger>
           <SheetContent>
-            <SheetTitle>Filters</SheetTitle>
-            <div className="mt-6 space-y-6">
+            <SheetHeader>
+              <SheetTitle>Filters</SheetTitle>
+            </SheetHeader>
+            <div className="space-y-5 px-4 pb-4">
               {/* Sort */}
               <div className="space-y-2">
                 <Label>Sort by</Label>
@@ -150,19 +153,19 @@ export function SearchFilters({ allTags, allDietaryTags }: SearchFiltersProps) {
               </div>
 
               {/* Favorites only */}
-              <div className="flex items-center gap-2">
+              <label className="flex items-center gap-3 rounded-md py-2 cursor-pointer">
                 <Switch
                   checked={favoritesOnly}
                   onCheckedChange={setFavoritesOnly}
                 />
-                <Label>Favorites only</Label>
-              </div>
+                <span className="text-sm font-medium">Favorites only</span>
+              </label>
 
               {/* Tags */}
               {allTags.length > 0 && (
                 <div className="space-y-2">
                   <Label>Tags</Label>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {allTags.map((tag) => (
                       <Badge
                         key={tag.id}
@@ -185,7 +188,7 @@ export function SearchFilters({ allTags, allDietaryTags }: SearchFiltersProps) {
               {allDietaryTags.length > 0 && (
                 <div className="space-y-2">
                   <Label>Dietary</Label>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {allDietaryTags.map((tag) => (
                       <Badge
                         key={tag.id}
@@ -206,7 +209,7 @@ export function SearchFilters({ allTags, allDietaryTags }: SearchFiltersProps) {
 
               {/* Clear */}
               {hasFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                <Button variant="ghost" className="w-full" onClick={clearFilters}>
                   <X className="mr-1 h-4 w-4" />
                   Clear all filters
                 </Button>

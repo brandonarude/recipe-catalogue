@@ -79,7 +79,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
                 <button
                   key={s.id}
                   type="button"
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-accent"
+                  className="w-full px-3 py-2.5 md:py-2 text-left text-sm hover:bg-accent"
                   onMouseDown={() => addTag(s.name)}
                 >
                   {toTitleCase(s.name)}

@@ -57,7 +57,7 @@ export function RatingStars({
             onMouseEnter={() => interactive && setHovered(star)}
             onMouseLeave={() => setHovered(0)}
             className={cn(
-              "p-1 transition-colors",
+              "p-1.5 md:p-1 transition-colors",
               interactive && "cursor-pointer hover:scale-110"
             )}
           >
