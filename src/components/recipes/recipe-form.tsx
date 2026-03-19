@@ -23,9 +23,10 @@ interface DietaryTag {
 interface RecipeFormProps {
   recipeId?: string;
   defaultValues?: Partial<RecipeCreateInput>;
+  scrapedIngredientNames?: string[];
 }
 
-export function RecipeForm({ recipeId, defaultValues }: RecipeFormProps) {
+export function RecipeForm({ recipeId, defaultValues, scrapedIngredientNames }: RecipeFormProps) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [dietaryTags, setDietaryTags] = useState<DietaryTag[]>([]);
@@ -50,7 +51,7 @@ export function RecipeForm({ recipeId, defaultValues }: RecipeFormProps) {
       servings: 4,
       notes: "",
       sourceUrl: "",
-      ingredients: [{ name: "", quantity: null, unit: null, preparation: null, category: "OTHER" }],
+      ingredients: [{ ingredientId: "", ingredientName: "", quantity: null, unit: null, preparation: null }],
       tags: [],
       dietaryTagIds: [],
       ...defaultValues,
@@ -85,10 +86,19 @@ export function RecipeForm({ recipeId, defaultValues }: RecipeFormProps) {
     try {
       const url = isEdit ? `/api/recipes/${recipeId}` : "/api/recipes";
       const method = isEdit ? "PUT" : "POST";
+      const apiData = {
+        ...data,
+        ingredients: data.ingredients.map(({ ingredientId, quantity, unit, preparation }) => ({
+          ingredientId,
+          quantity,
+          unit,
+          preparation,
+        })),
+      };
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(apiData),
       });
 
       if (!res.ok) {
@@ -150,6 +160,7 @@ export function RecipeForm({ recipeId, defaultValues }: RecipeFormProps) {
               setValue(`ingredients.${index}`, val, { shouldValidate: true });
             }}
             onRemove={() => removeIngredient(index)}
+            scrapedName={scrapedIngredientNames?.[index]}
           />
         ))}
         <Button
@@ -157,7 +168,7 @@ export function RecipeForm({ recipeId, defaultValues }: RecipeFormProps) {
           variant="outline"
           size="sm"
           onClick={() =>
-            appendIngredient({ name: "", quantity: null, unit: null, preparation: null, category: "OTHER" })
+            appendIngredient({ ingredientId: "", ingredientName: "", quantity: null, unit: null, preparation: null })
           }
         >
           <Plus className="mr-1 h-4 w-4" />

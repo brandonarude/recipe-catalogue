@@ -1,67 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { useDebounce } from "@/hooks/use-debounce";
+import { IngredientCombobox } from "./ingredient-combobox";
 import type { IngredientInput } from "@/lib/validators/recipe";
 
 interface IngredientInputProps {
   value: IngredientInput;
   onChange: (value: IngredientInput) => void;
   onRemove: () => void;
+  scrapedName?: string;
 }
 
-export function IngredientInputRow({ value, onChange, onRemove }: IngredientInputProps) {
-  const [query, setQuery] = useState(value.name);
-  const [suggestions, setSuggestions] = useState<{ id: string; name: string }[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const debouncedQuery = useDebounce(query, 300);
-
-  useEffect(() => {
-    if (debouncedQuery.length < 1) {
-      setSuggestions([]);
-      return;
-    }
-    fetch(`/api/ingredients?q=${encodeURIComponent(debouncedQuery)}`)
-      .then((r) => r.json())
-      .then(setSuggestions)
-      .catch(() => setSuggestions([]));
-  }, [debouncedQuery]);
-
+export function IngredientInputRow({ value, onChange, onRemove, scrapedName }: IngredientInputProps) {
   return (
     <div className="flex flex-wrap items-start gap-2">
-      <div className="relative flex-1 min-w-[140px]">
-        <Input
-          placeholder="Ingredient name"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            onChange({ ...value, name: e.target.value });
-            setShowSuggestions(true);
-          }}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-          onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+      <div className="flex-1 min-w-[140px]">
+        <IngredientCombobox
+          value={{ ingredientId: value.ingredientId, ingredientName: value.ingredientName }}
+          onChange={({ ingredientId, ingredientName }) =>
+            onChange({ ...value, ingredientId, ingredientName })
+          }
+          scrapedName={scrapedName}
         />
-        {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute z-10 mt-1 w-full rounded-md border bg-popover shadow-md">
-            {suggestions.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                className="w-full px-3 py-2.5 md:py-2 text-left text-sm hover:bg-accent"
-                onMouseDown={() => {
-                  setQuery(s.name);
-                  onChange({ ...value, name: s.name });
-                  setShowSuggestions(false);
-                }}
-              >
-                {s.name}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
       <Input
         className="flex-1 sm:flex-none sm:w-20"

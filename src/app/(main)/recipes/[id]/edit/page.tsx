@@ -41,11 +41,11 @@ export default async function EditRecipePage({
     notes: recipe.notes || "",
     sourceUrl: recipe.sourceUrl || "",
     ingredients: recipe.ingredients.map((ri) => ({
-      name: ri.ingredient.name,
+      ingredientId: ri.ingredientId,
+      ingredientName: ri.ingredient.name,
       quantity: ri.quantity,
       unit: ri.unit,
       preparation: ri.preparation,
-      category: ri.ingredient.category as "OTHER",
     })),
     tags: recipe.tags.map((rt) => rt.tag.name),
     dietaryTagIds: recipe.dietaryTags.map((rdt) => rdt.dietaryTagId),

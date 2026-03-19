@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import type { RecipeCreateInput } from "@/lib/validators/recipe";
 
 interface ImportFormProps {
-  onImported: (data: Partial<RecipeCreateInput>) => void;
+  onImported: (data: Partial<RecipeCreateInput>, scrapedIngredientNames: string[]) => void;
 }
 
 export function ImportForm({ onImported }: ImportFormProps) {
@@ -33,22 +32,40 @@ export function ImportForm({ onImported }: ImportFormProps) {
       if (!res.ok) {
         toast.error(data.error || "Failed to import recipe");
         if (data.sourceUrl) {
-          onImported({ sourceUrl: data.sourceUrl });
+          onImported({ sourceUrl: data.sourceUrl }, []);
         }
         return;
       }
 
+      // Extract scraped ingredient names and transform to new shape
+      const scrapedNames: string[] = (data.ingredients || []).map(
+        (ing: { name?: string }) => ing.name || ""
+      );
+
+      const ingredients = (data.ingredients || []).map(
+        (ing: { quantity?: number; unit?: string; preparation?: string }) => ({
+          ingredientId: "",
+          ingredientName: "",
+          quantity: ing.quantity ?? null,
+          unit: ing.unit ?? null,
+          preparation: ing.preparation ?? null,
+        })
+      );
+
       toast.success("Recipe imported! Review and save below.");
-      onImported({
-        title: data.title,
-        description: data.description,
-        steps: data.steps,
-        prepTime: data.prepTime,
-        cookTime: data.cookTime,
-        servings: data.servings,
-        ingredients: data.ingredients,
-        sourceUrl: data.sourceUrl,
-      });
+      onImported(
+        {
+          title: data.title,
+          description: data.description,
+          steps: data.steps,
+          prepTime: data.prepTime,
+          cookTime: data.cookTime,
+          servings: data.servings,
+          ingredients,
+          sourceUrl: data.sourceUrl,
+        },
+        scrapedNames
+      );
     } catch {
       toast.error("Failed to import recipe");
     } finally {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ingredientCreateSchema } from "@/lib/validators/ingredient";
 
 const VALID_CATEGORIES = [
   "PRODUCE", "DAIRY", "MEAT", "SEAFOOD", "BAKERY",
@@ -58,4 +59,33 @@ export async function GET(request: NextRequest) {
     page,
     totalPages: Math.ceil(total / limit),
   });
+}
+
+export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const parsed = ingredientCreateSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", issues: parsed.error.issues },
+      { status: 400 }
+    );
+  }
+
+  const normalizedName = parsed.data.name.toLowerCase().trim();
+
+  const ingredient = await prisma.ingredient.upsert({
+    where: { name: normalizedName },
+    update: {},
+    create: {
+      name: normalizedName,
+      category: parsed.data.category,
+    },
+  });
+
+  return NextResponse.json(ingredient, { status: 201 });
 }

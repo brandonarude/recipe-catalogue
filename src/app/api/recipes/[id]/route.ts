@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { recipeUpdateSchema } from "@/lib/validators/recipe";
+import { recipeApiUpdateSchema } from "@/lib/validators/recipe";
 
 export async function GET(
   _request: NextRequest,
@@ -75,7 +75,7 @@ export async function PUT(
   }
 
   const body = await request.json();
-  const parsed = recipeUpdateSchema.safeParse(body);
+  const parsed = recipeApiUpdateSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Validation failed", issues: parsed.error.issues },
@@ -115,25 +115,13 @@ export async function PUT(
 
   if (ingredients) {
     updateData.ingredients = {
-      create: await Promise.all(
-        ingredients.map(async (ing, index) => {
-          const ingredient = await prisma.ingredient.upsert({
-            where: { name: ing.name.toLowerCase().trim() },
-            update: {},
-            create: {
-              name: ing.name.toLowerCase().trim(),
-              category: ing.category || "OTHER",
-            },
-          });
-          return {
-            ingredientId: ingredient.id,
-            quantity: ing.quantity ?? null,
-            unit: ing.unit ?? null,
-            preparation: ing.preparation ?? null,
-            orderIndex: index,
-          };
-        })
-      ),
+      create: ingredients.map((ing, index) => ({
+        ingredientId: ing.ingredientId,
+        quantity: ing.quantity ?? null,
+        unit: ing.unit ?? null,
+        preparation: ing.preparation ?? null,
+        orderIndex: index,
+      })),
     };
   }
 
