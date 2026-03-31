@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ChevronsUpDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +34,18 @@ export function IngredientCombobox({ value, onChange, scrapedName }: IngredientC
   const [results, setResults] = useState<IngredientOption[]>([]);
   const [showCreate, setShowCreate] = useState(false);
   const debouncedSearch = useDebounce(search, 300);
+
+  const handleOpenChange = useCallback((nextOpen: boolean) => {
+    if (nextOpen) {
+      const scrollY = window.scrollY;
+      setOpen(true);
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: scrollY, behavior: "instant" });
+      });
+    } else {
+      setOpen(false);
+    }
+  }, []);
 
   // Pre-populate search with scraped name when opening if no ingredient selected
   useEffect(() => {
@@ -69,7 +81,7 @@ export function IngredientCombobox({ value, onChange, scrapedName }: IngredientC
 
   return (
     <>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger
           render={
             <Button

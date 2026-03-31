@@ -72,7 +72,7 @@ export function RecipeForm({ recipeId, defaultValues, scrapedIngredientNames }: 
 
   const watchedTags = watch("tags");
   const watchedDietaryTagIds = watch("dietaryTagIds");
-  const watchedIngredients = watch("ingredients");
+
 
   useEffect(() => {
     fetch("/api/dietary-tags")
@@ -155,10 +155,9 @@ export function RecipeForm({ recipeId, defaultValues, scrapedIngredientNames }: 
         {ingredientFields.map((field, index) => (
           <IngredientInputRow
             key={field.id}
-            value={watchedIngredients[index]}
-            onChange={(val) => {
-              setValue(`ingredients.${index}`, val, { shouldValidate: true });
-            }}
+            control={control}
+            index={index}
+            setValue={setValue}
             onRemove={() => removeIngredient(index)}
             scrapedName={scrapedIngredientNames?.[index]}
           />
