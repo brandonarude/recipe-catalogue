@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { RecipeDetail } from "@/components/recipes/recipe-detail";
+import { CompanionChat } from "@/components/recipes/companion-chat";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -60,6 +61,7 @@ export default async function RecipeDetailPage({
         currentUserId={session.user.id}
         isAdmin={session.user.role === "ADMIN"}
       />
+      <CompanionChat recipeId={id} recipeTitle={recipe.title} />
     </div>
   );
 }
