@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
-import { Nunito, Lora } from "next/font/google";
+import { DM_Sans, Playfair_Display } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
 import { auth } from "@/lib/auth";
 import "./globals.css";
 
-const nunito = Nunito({
-  variable: "--font-sans",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  display: "swap",
 });
 
-const lora = Lora({
-  variable: "--font-heading",
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,8 +30,8 @@ export default async function RootLayout({
 }>) {
   const session = await auth();
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${nunito.variable} ${lora.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${dmSans.variable} ${playfairDisplay.variable}`}>
+      <body className="antialiased">
         <Providers session={session}>{children}</Providers>
       </body>
     </html>
