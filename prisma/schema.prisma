@@ -221,6 +221,7 @@ model ShoppingListItem {
   quantity       Float?
   unit           String?
   checked        Boolean @default(false)
+  orderIndex     Int     @default(0)
 
   shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
   ingredient   Ingredient   @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
