@@ -307,10 +307,10 @@ function SortableShoppingItem({ item, onToggle }: SortableShoppingItemProps) {
               : "text-base"
           }
         >
-          {item.quantity != null && <strong>{item.quantity}</strong>}
-          {item.unit && ` ${item.unit}`}
-          {" "}
           {toTitleCase(item.ingredient.name)}
+          {" "}
+          {item.quantity != null && <strong>{item.quantity}</strong>}
+          {item.unit && ` ${item.unit}`}          
         </span>
       </label>
     </div>
