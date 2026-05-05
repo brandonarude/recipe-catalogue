@@ -17,3 +17,14 @@ export const checkItemSchema = z.object({
   itemId: z.string(),
   checked: z.boolean(),
 });
+
+export const reorderItemsSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        id: z.string(),
+        orderIndex: z.number().int().nonnegative(),
+      })
+    )
+    .min(1),
+});
