@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const addRecipeIngredientsSchema = z.object({
-  recipeId: z.string(),
+  recipeId: z.string().optional(),
   ingredients: z
     .array(
       z.object({
