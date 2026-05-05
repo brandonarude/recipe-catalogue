@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { ingredientUpdateSchema } from "@/lib/validators/ingredient";
 
 async function requireAdmin() {
   const session = await auth();
@@ -68,6 +69,59 @@ export async function GET(
     _count: ingredient._count,
     recipes,
   });
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await requireAdmin();
+  if (!session) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const { id } = await params;
+
+  const body = await request.json();
+  const parsed = ingredientUpdateSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", issues: parsed.error.issues },
+      { status: 400 }
+    );
+  }
+
+  const existing = await prisma.ingredient.findUnique({ where: { id } });
+  if (!existing) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  const normalizedName = parsed.data.name.toLowerCase().trim();
+
+  if (normalizedName !== existing.name) {
+    const collision = await prisma.ingredient.findUnique({
+      where: { name: normalizedName },
+    });
+    if (collision) {
+      return NextResponse.json(
+        {
+          error:
+            "An ingredient with this name already exists. Use merge to combine them.",
+        },
+        { status: 409 }
+      );
+    }
+  }
+
+  const updated = await prisma.ingredient.update({
+    where: { id },
+    data: {
+      name: normalizedName,
+      category: parsed.data.category,
+    },
+  });
+
+  return NextResponse.json(updated);
 }
 
 export async function DELETE(

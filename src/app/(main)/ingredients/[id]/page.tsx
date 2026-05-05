@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Badge } from "@/components/ui/badge";
 import { RecipeGrid } from "@/components/recipes/recipe-grid";
+import { IngredientHeader } from "@/components/ingredients/ingredient-header";
 
 export const dynamic = "force-dynamic";
 
@@ -55,15 +55,19 @@ export default async function IngredientDetailPage({
     };
   });
 
+  const isAdmin = session.user.role === "ADMIN";
+
   return (
     <div>
-      <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold">{ingredient.name}</h1>
-        <Badge variant="secondary">{ingredient.category}</Badge>
-      </div>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Used in {recipes.length} recipe(s)
-      </p>
+      <IngredientHeader
+        ingredient={{
+          id: ingredient.id,
+          name: ingredient.name,
+          category: ingredient.category,
+        }}
+        recipeCount={recipes.length}
+        isAdmin={isAdmin}
+      />
 
       <div className="mt-6">
         <RecipeGrid recipes={recipes} />
