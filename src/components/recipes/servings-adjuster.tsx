@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toTitleCase } from "@/lib/utils";
+import { formatQuantity, toTitleCase } from "@/lib/utils";
 
 interface Ingredient {
   id: string;
@@ -16,25 +16,6 @@ interface Ingredient {
 interface ServingsAdjusterProps {
   baseServings: number;
   ingredients: Ingredient[];
-}
-
-function formatQuantity(q: number): string {
-  if (q === Math.floor(q)) return q.toString();
-  // Common fractions
-  const frac = q - Math.floor(q);
-  const whole = Math.floor(q);
-  const fractions: Record<string, string> = {
-    "0.25": "\u00BC",
-    "0.33": "\u2153",
-    "0.5": "\u00BD",
-    "0.67": "\u2154",
-    "0.75": "\u00BE",
-  };
-  const key = frac.toFixed(2);
-  if (fractions[key]) {
-    return whole > 0 ? `${whole}${fractions[key]}` : fractions[key];
-  }
-  return q.toFixed(1);
 }
 
 export function ServingsAdjuster({ baseServings, ingredients }: ServingsAdjusterProps) {

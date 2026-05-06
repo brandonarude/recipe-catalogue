@@ -13,11 +13,23 @@ export async function GET(
 
   const { id } = await params;
 
-  const ingredients = await prisma.recipeIngredient.findMany({
-    where: { recipeId: id },
-    include: { ingredient: true },
-    orderBy: { orderIndex: "asc" },
+  const recipe = await prisma.recipe.findUnique({
+    where: { id },
+    select: {
+      servings: true,
+      ingredients: {
+        include: { ingredient: true },
+        orderBy: { orderIndex: "asc" },
+      },
+    },
   });
 
-  return NextResponse.json(ingredients);
+  if (!recipe) {
+    return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
+  }
+
+  return NextResponse.json({
+    servings: recipe.servings,
+    ingredients: recipe.ingredients,
+  });
 }
