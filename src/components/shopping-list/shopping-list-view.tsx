@@ -28,6 +28,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import { EditShoppingItemSheet } from "@/components/shopping-list/edit-shopping-item-sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,6 +60,7 @@ interface ShoppingListData {
 export function ShoppingListView() {
   const [list, setList] = useState<ShoppingListData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -103,6 +105,28 @@ export function ShoppingListView() {
     } catch {
       toast.error("Failed to update item");
     }
+  }
+
+  function applyItemPatch(
+    itemId: string,
+    patch: { quantity: number | null; unit: string | null }
+  ) {
+    setList((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        items: prev.items.map((item) =>
+          item.id === itemId ? { ...item, ...patch } : item
+        ),
+      };
+    });
+  }
+
+  function removeItemFromState(itemId: string) {
+    setList((prev) => {
+      if (!prev) return prev;
+      return { ...prev, items: prev.items.filter((i) => i.id !== itemId) };
+    });
   }
 
   async function handleExport() {
@@ -246,6 +270,7 @@ export function ShoppingListView() {
                     key={item.id}
                     item={item}
                     onToggle={toggleItem}
+                    onEdit={setEditingItemId}
                   />
                 ))}
               </div>
@@ -254,6 +279,16 @@ export function ShoppingListView() {
           <Separator className="mt-3" />
         </div>
       ))}
+
+      <EditShoppingItemSheet
+        item={list.items.find((i) => i.id === editingItemId) ?? null}
+        open={editingItemId !== null}
+        onOpenChange={(next) => {
+          if (!next) setEditingItemId(null);
+        }}
+        onUpdated={applyItemPatch}
+        onRemoved={removeItemFromState}
+      />
     </div>
   );
 }
@@ -261,9 +296,14 @@ export function ShoppingListView() {
 interface SortableShoppingItemProps {
   item: ShoppingItem;
   onToggle: (itemId: string, checked: boolean) => void;
+  onEdit: (itemId: string) => void;
 }
 
-function SortableShoppingItem({ item, onToggle }: SortableShoppingItemProps) {
+function SortableShoppingItem({
+  item,
+  onToggle,
+  onEdit,
+}: SortableShoppingItemProps) {
   const {
     attributes,
     listeners,
@@ -282,7 +322,7 @@ function SortableShoppingItem({ item, onToggle }: SortableShoppingItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-2 rounded-md px-2 py-2.5 hover:bg-accent ${
+      className={`flex items-center gap-2 rounded-md px-2 hover:bg-accent ${
         isDragging ? "z-10 bg-background shadow-lg" : ""
       }`}
     >
@@ -295,11 +335,19 @@ function SortableShoppingItem({ item, onToggle }: SortableShoppingItemProps) {
       >
         <GripVertical className="h-5 w-5" />
       </button>
-      <label className="flex flex-1 items-center gap-3 cursor-pointer">
+      <div className="py-2.5">
         <Checkbox
           checked={item.checked}
           onCheckedChange={(checked) => onToggle(item.id, checked === true)}
+          aria-label={`Mark ${item.ingredient.name} as ${item.checked ? "not done" : "done"}`}
         />
+      </div>
+      <button
+        type="button"
+        onClick={() => onEdit(item.id)}
+        className="flex-1 cursor-pointer py-2.5 pl-3 text-left"
+        aria-label={`Edit ${item.ingredient.name}`}
+      >
         <span
           className={
             item.checked
@@ -310,9 +358,9 @@ function SortableShoppingItem({ item, onToggle }: SortableShoppingItemProps) {
           {toTitleCase(item.ingredient.name)}
           {" "}
           {item.quantity != null && <strong>{item.quantity}</strong>}
-          {item.unit && ` ${item.unit}`}          
+          {item.unit && ` ${item.unit}`}
         </span>
-      </label>
+      </button>
     </div>
   );
 }

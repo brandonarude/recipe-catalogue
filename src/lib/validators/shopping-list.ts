@@ -18,6 +18,15 @@ export const checkItemSchema = z.object({
   checked: z.boolean(),
 });
 
+export const updateItemSchema = z
+  .object({
+    quantity: z.number().nullable().optional(),
+    unit: z.string().nullable().optional(),
+  })
+  .refine((d) => d.quantity !== undefined || d.unit !== undefined, {
+    message: "At least one field must be provided",
+  });
+
 export const reorderItemsSchema = z.object({
   items: z
     .array(
