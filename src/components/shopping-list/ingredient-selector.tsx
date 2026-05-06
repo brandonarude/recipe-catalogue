@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toTitleCase } from "@/lib/utils";
+import { formatQuantity, toTitleCase } from "@/lib/utils";
 
 interface RecipeIngredient {
   id: string;
@@ -21,6 +21,11 @@ interface RecipeIngredient {
   unit: string | null;
   preparation: string | null;
   ingredient: { id: string; name: string; category: string };
+}
+
+interface IngredientsResponse {
+  servings: number;
+  ingredients: RecipeIngredient[];
 }
 
 interface IngredientSelectorContentProps {
@@ -40,13 +45,17 @@ export function IngredientSelectorContent({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [baseServings, setBaseServings] = useState<number | null>(null);
+  const [servings, setServings] = useState<number | null>(null);
 
   useEffect(() => {
     fetch(`/api/recipes/${recipeId}/ingredients`)
       .then((r) => r.json())
-      .then((data: RecipeIngredient[]) => {
-        setIngredients(data);
-        setSelected(new Set(data.map((i) => i.id)));
+      .then((data: IngredientsResponse) => {
+        setIngredients(data.ingredients);
+        setSelected(new Set(data.ingredients.map((i) => i.id)));
+        setBaseServings(data.servings);
+        setServings(data.servings);
       })
       .catch(() => toast.error("Failed to load ingredients"))
       .finally(() => setLoading(false));
@@ -74,7 +83,7 @@ export function IngredientSelectorContent({
       .filter((i) => selected.has(i.id))
       .map((i) => ({
         ingredientId: i.ingredientId,
-        quantity: i.quantity,
+        quantity: i.quantity != null ? i.quantity * scale : null,
         unit: i.unit,
       }));
 
@@ -119,6 +128,8 @@ export function IngredientSelectorContent({
   }
 
   const allSelected = selected.size === ingredients.length;
+  const scale =
+    baseServings && servings && baseServings > 0 ? servings / baseServings : 1;
 
   return (
     <div className="space-y-4">
@@ -126,6 +137,38 @@ export function IngredientSelectorContent({
         Select ingredients from <strong>{recipeTitle}</strong> to add to your
         shopping list.
       </p>
+
+      {baseServings != null && servings != null && (
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium">Servings:</span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setServings(Math.max(1, servings - 1))}
+              disabled={servings <= 1}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <span className="w-8 text-center font-semibold">{servings}</span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setServings(servings + 1)}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          {servings !== baseServings && (
+            <button
+              className="text-xs text-primary hover:underline"
+              onClick={() => setServings(baseServings)}
+            >
+              Reset
+            </button>
+          )}
+        </div>
+      )}
 
       <label className="flex items-center gap-3 rounded-md px-3 py-3 md:py-2 hover:bg-accent cursor-pointer">
         <Checkbox checked={allSelected} onCheckedChange={toggleAll} />
@@ -137,27 +180,30 @@ export function IngredientSelectorContent({
       <Separator />
 
       <div className="max-h-[40vh] space-y-1 overflow-y-auto">
-        {ingredients.map((ing) => (
-          <label
-            key={ing.id}
-            className="flex items-center gap-3 rounded-md px-3 py-3 md:py-1.5 hover:bg-accent cursor-pointer"
-          >
-            <Checkbox
-              checked={selected.has(ing.id)}
-              onCheckedChange={() => toggleOne(ing.id)}
-            />
-            <span className="text-base md:text-sm">
-              {ing.quantity != null && <strong>{ing.quantity}</strong>}
-              {ing.unit && ` ${ing.unit}`}{" "}
-              {toTitleCase(ing.ingredient.name)}
-              {ing.preparation && (
-                <span className="text-muted-foreground">
-                  , {ing.preparation}
-                </span>
-              )}
-            </span>
-          </label>
-        ))}
+        {ingredients.map((ing) => {
+          const scaledQty = ing.quantity != null ? ing.quantity * scale : null;
+          return (
+            <label
+              key={ing.id}
+              className="flex items-center gap-3 rounded-md px-3 py-3 md:py-1.5 hover:bg-accent cursor-pointer"
+            >
+              <Checkbox
+                checked={selected.has(ing.id)}
+                onCheckedChange={() => toggleOne(ing.id)}
+              />
+              <span className="text-base md:text-sm">
+                {scaledQty != null && <strong>{formatQuantity(scaledQty)}</strong>}
+                {ing.unit && ` ${ing.unit}`}{" "}
+                {toTitleCase(ing.ingredient.name)}
+                {ing.preparation && (
+                  <span className="text-muted-foreground">
+                    , {ing.preparation}
+                  </span>
+                )}
+              </span>
+            </label>
+          );
+        })}
       </div>
 
       <div className="flex gap-2">
