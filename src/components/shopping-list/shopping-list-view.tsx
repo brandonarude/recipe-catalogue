@@ -28,7 +28,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { EditShoppingItemSheet } from "@/components/shopping-list/edit-shopping-item-sheet";
+import { EditShoppingItemDialog } from "@/components/shopping-list/edit-shopping-item-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -280,7 +280,7 @@ export function ShoppingListView() {
         </div>
       ))}
 
-      <EditShoppingItemSheet
+      <EditShoppingItemDialog
         item={list.items.find((i) => i.id === editingItemId) ?? null}
         open={editingItemId !== null}
         onOpenChange={(next) => {

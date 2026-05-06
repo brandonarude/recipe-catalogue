@@ -7,15 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toTitleCase } from "@/lib/utils";
 
-interface EditShoppingItemSheetProps {
+interface EditShoppingItemDialogProps {
   item: {
     id: string;
     quantity: number | null;
@@ -31,13 +31,13 @@ interface EditShoppingItemSheetProps {
   onRemoved: (itemId: string) => void;
 }
 
-export function EditShoppingItemSheet({
+export function EditShoppingItemDialog({
   item,
   open,
   onOpenChange,
   onUpdated,
   onRemoved,
-}: EditShoppingItemSheetProps) {
+}: EditShoppingItemDialogProps) {
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -53,8 +53,7 @@ export function EditShoppingItemSheet({
     const current = quantity.trim() === "" ? 0 : parseFloat(quantity);
     if (Number.isNaN(current)) return;
     const next = Math.max(0, current + delta);
-    // Trim trailing .0 for integers
-    setQuantity(Number.isInteger(next) ? String(next) : String(next));
+    setQuantity(String(next));
   }
 
   async function handleSave() {
@@ -108,15 +107,15 @@ export function EditShoppingItemSheet({
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-xl">
-        <SheetHeader>
-          <SheetTitle>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
             {item ? toTitleCase(item.ingredient.name) : "Edit item"}
-          </SheetTitle>
-        </SheetHeader>
+          </DialogTitle>
+        </DialogHeader>
 
-        <div className="space-y-4 px-4 pb-2">
+        <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="edit-item-qty">Quantity</Label>
             <div className="flex items-center gap-2">
@@ -165,7 +164,7 @@ export function EditShoppingItemSheet({
           </div>
         </div>
 
-        <SheetFooter className="flex-row justify-between sm:flex-row">
+        <DialogFooter className="flex-row justify-between sm:justify-between">
           <Button
             type="button"
             variant="ghost"
@@ -189,8 +188,8 @@ export function EditShoppingItemSheet({
               {submitting ? "Saving..." : "Save"}
             </Button>
           </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
